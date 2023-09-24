@@ -7,20 +7,22 @@ export default function App() {
     const [isLoading, setIsLoading] = useState(null)
     const [error, setError] = useState(null)
     const [movies, setMovies] = useState(null)
+    const [series, setSeries] = useState(null)
 
     const handleOnChange = userInput => {
         setIsLoading(true)
         findByTitle(userInput)
             .then(response => response.data)
             .then(data => {
-                console.log(data)
                 if (data.Response === 'True') {
                     setError(null)
-                    setMovies(data.Search)
+                    setMovies(data.Search.filter(current => current.Type === 'movie'))
+                    setSeries(data.Search.filter(current => current.Type === 'series'))
                     setIsLoading(false)
                 } else {
                     setError(data.Error)
                     setMovies(null)
+                    setSeries(null)
                     setIsLoading(false)
                 }
             })
@@ -39,29 +41,40 @@ export default function App() {
     };
 
     return (
-        <div className="container">
-            <div className="search">
-                <input
-                    name="title"
-                    aria-label="title"
-                    placeholder="title"
-                    type="search"
-                    value={title}
-                    onChange={onChange}/>
+        <>
+            <div className="container">
+                <h1>My IMDB</h1>
+                <div className="search">
+                    <input
+                        name="title"
+                        aria-label="title"
+                        placeholder="title"
+                        type="search"
+                        value={title}
+                        onChange={onChange}/>
+                </div>
+                <div className="list">
+                    {error && <p>{error}</p>}
+                    {isLoading && <p>Loading...</p>}
+                    {movies && <List title="Movies" items={movies}/>}
+                    {series && <List title="Series" items={series}/>}
+                </div>
             </div>
-            <div className="list">
-                {error && <p>error</p>}
-                {isLoading && <p>Loading...</p>}
-                {movies && movies.map(movie => <ListItem movie={movie} key={movie.imdbID}/>)}
-            </div>
-        </div>
+        </>
     )
 }
 
-function ListItem({movie: {Poster, Title}}) {
+function List({title, items}) {
+    return <>
+        <h2>{title}</h2>
+        {items.map(item => <ListItem item={item} key={item.imdbID}/>)}
+    </>
+}
+
+function ListItem({item: {Poster, Title}}) {
     return <>
         <div className="list-item">
-            <h1>{Title}</h1>
+            <h3>{Title}</h3>
             <img src={Poster} alt={Title}/>
         </div>
     </>
