@@ -1,8 +1,8 @@
-import {findByTitle} from "./backend.js";
 import {useCallback, useState} from "react";
+import {findByTitle} from "../backend.js";
 import {debounce} from "lodash";
 
-export default function App() {
+export default function Root() {
     const [title, setTitle] = useState("")
     const [isLoading, setIsLoading] = useState(null)
     const [error, setError] = useState(null)
